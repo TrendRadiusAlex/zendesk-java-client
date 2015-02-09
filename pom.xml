@@ -23,13 +23,13 @@
     <version>6</version>
   </parent>
 
-  <groupId>com.cloudbees.thirdparty</groupId>
+  <groupId>com.trendradius.thirdparty</groupId>
   <artifactId>zendesk-java-client</artifactId>
-  <version>0.2.5-SNAPSHOT</version>
+  <version>0.2.6-SNAPSHOT</version>
 
   <name>zendesk-java-client</name>
   <description>Java client for the Zendesk API</description>
-  <url>https://github.com/cloudbees/zendesk-java-client</url>
+  <url>https://github.com/TrendRadiusAlex/zendesk-java-client</url>
   <inceptionYear>2013</inceptionYear>
   <licenses>
     <license>
@@ -50,9 +50,9 @@
   </prerequisites>
 
   <scm>
-    <connection>scm:git:git://github.com/cloudbees/zendesk-java-client.git</connection>
-    <developerConnection>scm:git:git@github.com:cloudbees/zendesk-java-client.git</developerConnection>
-    <url>http://github.com/cloudbees/zendesk-java-client/tree/master/</url>
+    <connection>scm:git:git://github.com/TrendRadiusAlex/zendesk-java-client.git</connection>
+    <developerConnection>scm:git:git@github.com:TrendRadiusAlex/zendesk-java-client.git</developerConnection>
+    <url>http://github.com/TrendRadiusAlex/zendesk-java-client/tree/master/</url>
     <tag>HEAD</tag>
   </scm>
   <issueManagement>
@@ -121,5 +121,19 @@
       </plugins>
     </pluginManagement>
   </build>
+  
+  <distributionManagement>
+   <repository>
+     <id>deployment</id>
+     <name>Internal Releases</name>
+     <url>http://23.99.226.15:8081/nexus/content/repositories/releases/</url>
+   </repository>
+   <snapshotRepository>
+     <id>deployment</id>
+     <name>Internal Releases</name>
+     <url>http://23.99.226.15:8081/nexus/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+  
 
 </project>
