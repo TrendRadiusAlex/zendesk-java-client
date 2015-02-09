@@ -189,6 +189,11 @@ public class Zendesk implements Closeable {
         return new PagedIterable<Ticket>(tmpl("/search.json{?query}").set("query", searchTerm + "+type:ticket"),
                 handleList(Ticket.class, "results"));
     }
+    
+    public Iterable<Ticket> getTicketsFromIncremental(long startTime) {
+        return new PagedIterable<Ticket>(tmpl("/incremental/tickets.json{?start_time}").set("start_time", startTime),
+                handleList(Ticket.class, "results"));
+    }
 
     public List<Ticket> getTickets(long id, long... ids) {
         return complete(submit(req("GET", tmpl("/tickets/show_many.json{?ids}").set("ids", idArray(id, ids))),
