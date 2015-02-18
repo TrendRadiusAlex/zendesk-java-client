@@ -25,6 +25,7 @@ import org.zendesk.client.v2.model.Forum;
 import org.zendesk.client.v2.model.Group;
 import org.zendesk.client.v2.model.GroupMembership;
 import org.zendesk.client.v2.model.Identity;
+import org.zendesk.client.v2.model.IncrementalResults;
 import org.zendesk.client.v2.model.Organization;
 import org.zendesk.client.v2.model.OrganizationField;
 import org.zendesk.client.v2.model.SearchResultEntity;
@@ -219,6 +220,11 @@ public class Zendesk implements Closeable {
     public Iterable<Ticket> getTicketsFromSearch(String searchTerm) {
         return new PagedIterable<Ticket>(tmpl("/search.json{?query}").set("query", searchTerm + "+type:ticket"),
                 handleList(Ticket.class, "results"));
+    }
+    
+    public IncrementalResults<Ticket> getTicketsFromIncremental(long startTime) {
+    	return complete(submit(req("GET", tmpl("/incremental/tickets.json{?start_time}").set("start_time", startTime)),
+    			handleIncrementalList(Ticket.class, "tickets")));
     }
 
     public List<Ticket> getTickets(long id, long... ids) {
@@ -1275,7 +1281,25 @@ public class Zendesk implements Closeable {
            }
        };
    }
-
+    
+    protected <T> AsyncCompletionHandler<IncrementalResults<T>> handleIncrementalList(final Class<T> clazz, final String name) {
+        return new AsyncCompletionHandler<IncrementalResults<T>>() {
+            @Override
+            public IncrementalResults<T> onCompleted(Response response) throws Exception {
+            	logResponse(response);
+                if (isStatus2xx(response)) {
+                	JsonNode responseNodes = mapper.readTree(response.getResponseBodyAsStream());
+                	Long endTime = mapper.convertValue(responseNodes.get("end_time"), Long.class);
+                    List<T> values = new ArrayList<T>();
+                    for (JsonNode node : responseNodes.get(name)) {
+                        values.add(mapper.convertValue(node, clazz));
+                    }
+                    return new IncrementalResults<T>(endTime,values);
+                }
+                throw new ZendeskResponseException(response);
+            }
+        };
+    }
     
     private TemplateUri tmpl(String template) {
         return new TemplateUri(url + template);
