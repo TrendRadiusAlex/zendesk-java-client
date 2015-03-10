@@ -1082,10 +1082,18 @@ public class Zendesk implements Closeable {
                 if (isStatus2xx(response)) {
                 	JsonNode responseNodes = mapper.readTree(response.getResponseBodyAsStream());
                 	Long endTime = mapper.convertValue(responseNodes.get("end_time"), Long.class);
-                    List<T> values = new ArrayList<T>();
-                    for (JsonNode node : responseNodes.get(name)) {
-                        values.add(mapper.convertValue(node, clazz));
+                    if(endTime == null){
+                    	endTime = System.currentTimeMillis()/1000;
                     }
+                	List<T> values;
+                    if(responseNodes.get(name).hasNonNull(0)){
+	                	values = new ArrayList<T>(responseNodes.get(name).size());
+	                	for (JsonNode node : responseNodes.get(name)) {
+	                    	values.add(mapper.convertValue(node, clazz));
+	                    }
+	                }else{
+	                	values = Collections.emptyList();
+	                }
                     return new IncrementalResults<T>(endTime,values);
                 }
                 throw new ZendeskResponseException(response);
